@@ -4,9 +4,13 @@ Philosophy is to not re-invent the wheel while allowing users to quickly test re
 
 Example invocation from top-level of repository:
 
-    docker build -t kylemanna/openvpn .
-    test/run.sh kylemanna/openvpn
-    # Be sure to pull kylemanna/openvpn:latest after you're done testing
+    docker build -t fedenunez/openvpn:local .
+    test/run.sh fedenunez/openvpn:local
+
+The same `Dockerfile` is used for `linux/amd64` and `linux/arm64`. To exercise
+the multi-architecture build configuration, install Docker Buildx and run:
+
+    docker buildx bake
 
 More details: https://github.com/docker-library/official-images/tree/master/test
 

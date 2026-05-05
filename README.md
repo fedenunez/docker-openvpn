@@ -15,39 +15,84 @@ a corresponding [Digital Ocean Community Tutorial](http://bit.ly/1AGUZkq).
 
 ## Quick Start
 
-Install this repository as a submodule, subrepo, or plain folder inside the
-project that owns your Docker Compose stack. For example:
+Choose one of the two methods below to include this repository in your project.
 
-    vpn-stack/
+### Option 1: Git Submodule
+
+```bash
+cd my-vpn-stack
+git submodule add https://github.com/fedenunez/docker-openvpn.git
+```
+
+To pull the latest version later:
+
+```bash
+git submodule update --remote docker-openvpn
+```
+
+### Option 2: Manual Clone
+
+```bash
+cd my-vpn-stack
+git clone https://github.com/fedenunez/docker-openvpn.git
+```
+
+To update later, run `git pull` inside the cloned folder.
+
+---
+
+In either case, your project structure should look like:
+
+    my-vpn-stack/
       compose.yml
       docker-openvpn/
 
-In `vpn-stack/compose.yml`, build the image from the local folder:
+Create `compose.yml`:
 
-    services:
-      openvpn:
-        build:
-          context: ./docker-openvpn
-        image: fedenunez/openvpn:local
-        cap_add:
-          - NET_ADMIN
-        ports:
-          - "1194:1194/udp"
-        restart: unless-stopped
-        volumes:
-          - ./openvpn-data/conf:/etc/openvpn
+```yaml
+services:
+  openvpn:
+    build: ./docker-openvpn
+    image: fedenunez/openvpn:local
+    container_name: openvpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1194:1194/udp"
+    restart: unless-stopped
+    volumes:
+      - ./openvpn-data/conf:/etc/openvpn
+```
 
-Build the local image, initialize configuration and PKI, then start the server:
+### Full Workflow
 
-    docker compose build openvpn
-    docker compose run --rm openvpn ovpn_genconfig -u udp://VPN.SERVERNAME.COM
-    docker compose run --rm -it openvpn ovpn_initpki
-    docker compose up -d openvpn
+```bash
+# Build the image
+docker compose build --pull openvpn
 
-Generate a client certificate and retrieve the client configuration:
+# Initialize configuration (replace with your server's domain or IP)
+docker compose run --rm openvpn ovpn_genconfig -u udp://VPN.SERVERNAME.COM
 
-    docker compose run --rm -it openvpn easyrsa build-client-full CLIENTNAME nopass
-    docker compose run --rm openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+# Initialize PKI (follow the interactive prompts)
+docker compose run --rm -it openvpn ovpn_initpki
+
+# Start the server
+docker compose up -d openvpn
+
+# Generate a client certificate (without passphrase)
+docker compose run --rm -it openvpn easyrsa build-client-full CLIENTNAME nopass
+
+# Retrieve the client .ovpn profile
+docker compose run --rm openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+```
+
+To rebuild after pulling updates (submodule or clone):
+
+```bash
+git submodule update --remote docker-openvpn   # if using submodule
+docker compose build --no-cache --pull openvpn
+docker compose up -d openvpn
+```
 
 ## Next Steps
 

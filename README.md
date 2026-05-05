@@ -1,17 +1,13 @@
 # OpenVPN for Docker
 
-[![Build Status](https://travis-ci.org/kylemanna/docker-openvpn.svg)](https://travis-ci.org/kylemanna/docker-openvpn)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn?ref=badge_shield)
-
-
 OpenVPN server in a Docker container complete with an EasyRSA PKI CA.
 
-Extensively tested on [Digital Ocean $5/mo node](http://bit.ly/1C7cKr3) and has
-a corresponding [Digital Ocean Community Tutorial](http://bit.ly/1AGUZkq).
-
-#### Upstream Links
-
-* GitHub @ [kylemanna/docker-openvpn](https://github.com/kylemanna/docker-openvpn)
+**Why this image?** It's built on the latest Alpine base and updates all
+system packages at build time. Every `docker compose build --pull` gives you
+the freshest OpenVPN, OpenSSL, and kernel-adjacent libraries without waiting
+for a maintainer to cut a release. In a world where CVEs drop on a Friday
+night, you control the update cadence — rebuild often, stay ahead of the patch
+curve, and keep your VPN stack as hardened as the upstreams allow.
 
 ## Quick Start
 
@@ -92,6 +88,28 @@ To rebuild after pulling updates (submodule or clone):
 git submodule update --remote docker-openvpn   # if using submodule
 docker compose build --no-cache --pull openvpn
 docker compose up -d openvpn
+```
+
+### Client Management
+
+```bash
+# List all issued certificates with validity status
+docker compose run --rm openvpn ovpn_listclients
+
+# Show currently connected clients (live log)
+docker compose run --rm openvpn ovpn_status
+
+# Generate profile for a single client
+docker compose run --rm openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+
+# Generate profiles for ALL clients at once
+docker compose run --rm openvpn ovpn_getclient_all
+
+# Revoke a client certificate
+docker compose run --rm openvpn ovpn_revokeclient CLIENTNAME
+
+# Set up OTP/2FA for a client (requires -2 flag at genconfig)
+docker compose run --rm -it openvpn ovpn_otp_user CLIENTNAME
 ```
 
 ## Next Steps
@@ -258,16 +276,8 @@ of a guarantee in the future.
   volume for re-use across containers
 * Addition of tls-auth for HMAC security
 
-## Originally Tested On
+---
 
-* Docker hosts:
-  * server a [Digital Ocean](https://www.digitalocean.com/?refcode=d19f7fe88c94) Droplet with 512 MB RAM running Ubuntu 14.04
-* Clients
-  * Android App OpenVPN Connect 1.1.14 (built 56)
-     * OpenVPN core 3.0 android armv7a thumb2 32-bit
-  * OS X Mavericks with Tunnelblick 3.4beta26 (build 3828) using openvpn-2.3.4
-  * ArchLinux OpenVPN pkg 2.3.4-1
-
+Based on [kylemanna/docker-openvpn](https://github.com/kylemanna/docker-openvpn), originally derived from [jpetazzo/dockvpn](https://github.com/jpetazzo/dockvpn).
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkylemanna%2Fdocker-openvpn?ref=badge_large)

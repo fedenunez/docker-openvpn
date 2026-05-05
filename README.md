@@ -96,8 +96,8 @@ docker compose up -d openvpn
 # List all issued certificates with validity status
 docker compose run --rm openvpn ovpn_listclients
 
-# Show currently connected clients (live log)
-docker compose run --rm openvpn ovpn_status
+# Show currently connected clients (live log — must exec into running container)
+docker compose exec openvpn ovpn_status
 
 # Generate profile for a single client
 docker compose run --rm openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn

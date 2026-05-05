@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Original credit: https://github.com/jpetazzo/dockvpn
-ARG ALPINE_VERSION=3.23
+ARG ALPINE_VERSION=latest
 FROM alpine:${ALPINE_VERSION}
 
 LABEL maintainer="Kyle Manna <kyle@kylemanna.com>" \
@@ -9,7 +9,8 @@ LABEL maintainer="Kyle Manna <kyle@kylemanna.com>" \
       org.opencontainers.image.description="OpenVPN server with EasyRSA PKI tooling" \
       org.opencontainers.image.source="https://github.com/kylemanna/docker-openvpn"
 
-RUN apk add --no-cache \
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache \
         bash \
         easy-rsa \
         google-authenticator \
